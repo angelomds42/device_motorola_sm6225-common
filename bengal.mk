@@ -297,7 +297,10 @@ PRODUCT_PACKAGES += \
 # NFC
 PRODUCT_PACKAGES += \
     com.android.nfc_extras \
-    Tag
+    Tag  \
+    SecureElement \
+    NfcNci
+
 
 # Overlay
 DEVICE_PACKAGE_OVERLAYS += \
