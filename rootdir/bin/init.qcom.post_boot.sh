@@ -4297,12 +4297,6 @@ case "$target" in
             echo 100 > /sys/devices/system/cpu/cpu4/core_ctl/offline_delay_ms
             echo 4 > /sys/devices/system/cpu/cpu4/core_ctl/task_thres
 
-            # Setting b.L scheduler parameters
-            echo 65 > /proc/sys/kernel/sched_downmigrate
-            echo 71 > /proc/sys/kernel/sched_upmigrate
-            echo 85 > /proc/sys/kernel/sched_group_downmigrate
-            echo 100 > /proc/sys/kernel/sched_group_upmigrate
-
             # cpuset settings
             echo 0-1     > /dev/cpuset/background/cpus
             echo 0-3     > /dev/cpuset/restricted/cpus
@@ -4310,24 +4304,40 @@ case "$target" in
             echo 0-2,4-7 > /dev/cpuset/foreground/cpus
             echo 0-7     > /dev/cpuset/top-app/cpus
 
-            # configure governor settings for little cluster
-            echo "schedutil" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-            echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/schedutil/up_rate_limit_us
-            echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/schedutil/down_rate_limit_us
-            echo 1516800 > /sys/devices/system/cpu/cpu0/cpufreq/schedutil/hispeed_freq
-            echo 691200 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
-            echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/schedutil/rtg_boost_freq
+	    # Configure CPU frequencies
+	    echo "schedutil" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+	    echo 300000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+	    echo 1804800 > /sys/devices/system/cpu/cpu0/cpufreq/schedutil/hispeed_freq
+	    echo "schedutil" > /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor
+	    echo 300000 > /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq
+	    echo 2208000 > /sys/devices/system/cpu/cpu4/cpufreq/schedutil/hispeed_freq
 
-            # configure governor settings for big cluster
-            echo "schedutil" > /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor
-            echo 0 > /sys/devices/system/cpu/cpu4/cpufreq/schedutil/up_rate_limit_us
-            echo 0 > /sys/devices/system/cpu/cpu4/cpufreq/schedutil/down_rate_limit_us
-            echo 1344000 > /sys/devices/system/cpu/cpu4/cpufreq/schedutil/hispeed_freq
-            echo 1056000 > /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq
-            echo 0 > /sys/devices/system/cpu/cpu4/cpufreq/schedutil/rtg_boost_freq
+	    # Configure input boost settings
+	    echo "0:1190000 4:1344000" > /sys/devices/system/cpu/cpu_boost/input_boost_freq
+	    echo 120 > /sys/devices/system/cpu/cpu_boost/input_boost_ms
+	    echo 1 > /sys/devices/system/cpu/cpu_boost/sched_boost_on_input
 
-            echo "0:1190000" > /sys/devices/system/cpu/cpu_boost/input_boost_freq
-            echo 80 > /sys/devices/system/cpu/cpu_boost/input_boost_ms
+	    # Configure schedutil ratelimits
+	    echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/schedutil/pl
+	    echo 500 > /sys/devices/system/cpu/cpu0/cpufreq/schedutil/up_rate_limit_us
+	    echo 20000 > /sys/devices/system/cpu/cpu0/cpufreq/schedutil/down_rate_limit_us
+	    echo 2000 > /sys/devices/system/cpu/cpu0/cpufreq/schedutil/up_rate_limit_us_screen_off
+	    echo 2000 > /sys/devices/system/cpu/cpu0/cpufreq/schedutil/down_rate_limit_us_screen_off
+	    echo 1 > /sys/devices/system/cpu/cpu4/cpufreq/schedutil/pl
+	    echo 500 > /sys/devices/system/cpu/cpu4/cpufreq/schedutil/up_rate_limit_us
+	    echo 10000 > /sys/devices/system/cpu/cpu4/cpufreq/schedutil/down_rate_limit_us
+	    echo 2000 > /sys/devices/system/cpu/cpu4/cpufreq/schedutil/up_rate_limit_us_screen_off
+	    echo 2000 > /sys/devices/system/cpu/cpu4/cpufreq/schedutil/down_rate_limit_us_screen_off
+
+	    # Configure scheduler
+	    echo "65 85" > /proc/sys/kernel/sched_upmigrate
+	    echo "60 75" > /proc/sys/kernel/sched_downmigrate
+	    echo 95 > /proc/sys/kernel/sched_group_upmigrate
+	    echo 75 > /proc/sys/kernel/sched_group_downmigrate
+
+	    # Back to default VM settings
+	    echo 3000 > /proc/sys/vm/dirty_expire_centisecs
+	    echo 10 > /proc/sys/vm/dirty_background_ratio
 
 	    echo 1 > /proc/sys/kernel/sched_walt_rotate_big_tasks
 
