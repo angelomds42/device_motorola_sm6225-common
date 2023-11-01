@@ -4304,9 +4304,11 @@ case "$target" in
             echo 100 > /proc/sys/kernel/sched_group_upmigrate
 
             # cpuset settings
-            echo 0-3 > /dev/cpuset/background/cpus
-            echo 0-3 > /dev/cpuset/system-background/cpus
-
+            echo 0-1     > /dev/cpuset/background/cpus
+            echo 0-3     > /dev/cpuset/restricted/cpus
+            echo 0-3     > /dev/cpuset/system-background/cpus
+            echo 0-2,4-7 > /dev/cpuset/foreground/cpus
+            echo 0-7     > /dev/cpuset/top-app/cpus
 
             # configure governor settings for little cluster
             echo "schedutil" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
